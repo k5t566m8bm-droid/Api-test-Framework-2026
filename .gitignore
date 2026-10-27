@@ -6,3 +6,4 @@ allure-report/
 *.db
 *.log
 .pytest_cache/
+.idea/
