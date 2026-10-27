@@ -1,0 +1,25 @@
+get_user_cases:
+  - case_name: "获取存在的用户1"
+    method: "GET"
+    path: "/users/1"
+    expect_status: 200
+    expect_field: "username"
+    expect_schema:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        username:
+          type: "string"
+      required: ["id", "username"]
+
+  - case_name: "获取存在的用户2"
+    method: "GET"
+    path: "/users/2"
+    expect_status: 200
+    expect_field: "email"
+
+  - case_name: "获取不存在的用户(异常测试)"
+    method: "GET"
+    path: "/users/9999"
+    expect_status: 404
