@@ -4,6 +4,7 @@ from service.order_service import OrderService
 
 
 @allure.feature("订单模块")
+@pytest.mark.skip(reason="业务演示用例，依赖真实订单接口与表结构，CI 环境自动跳过")
 def test_user_pay_order_success(api_client, db):
     """测试用户下单并支付成功"""
 
