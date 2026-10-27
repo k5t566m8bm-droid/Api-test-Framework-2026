@@ -77,8 +77,10 @@ class TestApiFlow:
             new_user_id = resp.json().get("id")
             assert new_user_id is not None, "接口未返回有效的用户ID"
 
-        with allure.step(f"步骤3：使用动态ID [{new_user_id}] 发送 GET 请求获取详情"):
-            get_resp = api_client.get(f"/users/{new_user_id}")
+        with allure.step("步骤3：JSONPlaceholder 不支持真实落库，使用固定存在的 ID=1 验证 GET 请求"):
+            # 因为 POST 接口并没有真正把数据写到服务器，所以动态 ID 查不到。
+            # 我们用真实存在的 ID=1 来演示接口请求逻辑。
+            get_resp = api_client.get("/users/1")
             assert get_resp.status_code == 200
 
         with allure.step(f"步骤4：使用动态ID [{new_user_id}] 发送 DELETE 请求"):
