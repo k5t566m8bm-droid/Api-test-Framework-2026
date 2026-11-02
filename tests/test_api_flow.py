@@ -3,6 +3,7 @@ import yaml
 import allure
 from core.assert_handler import AssertHandler
 import os
+from utils.data_factory import DataFactory
 
 # 获取当前文件所在目录的上一级（项目根目录）
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -68,7 +69,7 @@ class TestApiFlow:
         customer_name, job = create_and_clean_customer
 
         with allure.step("步骤1：查库确认前置数据存在"):
-            db_result = db.query_one("SELECT name, job FROM users WHERE name = ?", (customer_name,))
+            db_result = db.query_one("SELECT name, job FROM users WHERE name = :name", {"name": customer_name})
             assert db_result is not None
 
         with allure.step("步骤2：发送 POST 请求新增用户，提取动态ID"):
@@ -86,3 +87,18 @@ class TestApiFlow:
         with allure.step(f"步骤4：使用动态ID [{new_user_id}] 发送 DELETE 请求"):
             del_resp = api_client.delete(f"/users/{new_user_id}")
             assert del_resp.status_code == 200
+
+    # ...
+    @pytest.fixture
+    def create_and_clean_customer(self, db):
+        # 使用工厂生成唯一数据
+        customer_name = DataFactory.get_unique_name()
+        job = "自动化测试工程师"
+
+        with allure.step(f"前置准备：创建一条测试数据 -> {customer_name}"):
+            db.insert("INSERT INTO users (name, job) VALUES (:name, :job)", {"name": customer_name, "job": job})
+
+        yield customer_name, job
+
+        with allure.step(f"后置清理：自动删除测试数据 -> {customer_name}"):
+            db.delete("DELETE FROM users WHERE name = :name", {"name": customer_name})
